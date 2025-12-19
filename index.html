@@ -3,9 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <title> SarmiMani Quiz App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Quiz App</title>
 
     <style>
+
+       
         body {
             font-family: Arial;
             background: #eef2f3;
@@ -13,14 +17,17 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
+            
+            
         }
 
         .quiz-container {
             background: white;
-            width: 90%;
-            max-width: 360px;
+            width: 100%;
+            max-width: 420px;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 12px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             text-align: center;
         }
@@ -105,6 +112,46 @@
                 font-size: 14px;
             }
         }
+
+     @media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  .quiz-container {
+    width: 100%;
+    max-width: 100%;
+    min-height: auto;
+    border-radius: 12px;
+  }
+}
+
+
+  h2, h3 {
+    font-size: 22px;
+    line-height: 1.4;
+  }
+
+  button {
+    font-size: 18px;
+    padding: 16px;
+    margin: 10px 0;
+    border-radius: 8px;
+  }
+
+  #timer {
+    font-size: 16px;
+  }
+
+  #result {
+    font-size: 22px;
+  }
+
+  .progress {
+    height: 10px;
+  }
+}
+
     </style>
 </head>
 
@@ -279,6 +326,5 @@
     </script>
 
 </body>
-
 
 </html>
