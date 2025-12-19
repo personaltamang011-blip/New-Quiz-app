@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz App</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #eef2f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .quiz-container {
+            background: white;
+            width: 90%;
+            max-width: 360px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            background: yellowgreen;
+            color: white;
+        }
+
+        .next-btn {
+            background-color: #ff4da6;
+            /* pink */
+        }
+
+        .next-btn:hover {
+            background-color: #e60073;
+            /* darker pink */
+        }
+
+
+
+        button.correct {
+            background: #2ecc71;
+        }
+
+        button.wrong {
+            background: #e74c3c;
+        }
+
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .progress {
+            height: 8px;
+            background: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #3498db;
+        }
+
+        #result {
+            font-size: 20px;
+            margin: 10px 0;
+        }
+
+        #timer {
+            font-weight: bold;
+            color: #e67e22;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            h2,
+            h3 {
+                font-size: 18px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            #timer {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="quiz-container" id="app">
+
+        <!-- START SCREEN -->
+        <div id="startScreen">
+            <h2>🧠 Sarmimani Quiz App</h2>
+            <button onclick="startQuiz()">▶️ Start Quiz</button>
+        </div>
+
+        <!-- QUIZ SCREEN -->
+        <div id="quizScreen" style="display:none;">
+            <div class="progress">
+                <div class="progress-bar" id="progress"></div>
+            </div>
+            <div id="timer">⏱ Time: 10</div>
+            <h3 id="question"></h3>
+            <div id="answers"></div>
+            <div id="result"></div>
+            <button id="nextBtn" class="next-btn" onclick="nextQuestion()" style="display:none;">
+                Next
+            </button>
+        </div>
+
+        <!-- RESULT SCREEN -->
+        <div id="endScreen" style="display:none;">
+            <h2>🎉 Quiz Finished</h2>
+            <p id="finalScore"></p>
+            <button onclick="playAgain()">🔁 Play Again</button>
+        </div>
+
+    </div>
+
+    <audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
+    <audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+
+    <script>
+        const quiz = [
+            {
+                question: "SarmiMani home address?",
+                answers: ["Berlin", "Dharan", "Rome", "Madrid"],
+                correct: 1
+            },
+            {
+                question: "Which runs in browser?",
+                answers: ["Java", "Python", "JavaScript", "C++"],
+                correct: 2
+            },
+            {
+                question: "2 + 2 = ?",
+                answers: ["3", "4", "5", "6"],
+                correct: 1
+            },
+            {
+                question: "Which is a programming language?",
+                answers: ["HTML", "CSS", "JavaScript", "Photoshop"],
+                correct: 2
+            },
+            {
+                question: "HTML stands for?",
+                answers: [
+                    "Hyper Text Markup Language",
+                    "High Text Machine Language",
+                    "Hyper Tool Markup Language",
+                    "None"
+                ],
+                correct: 0
+            }
+        ];
+
+        let current = 0;
+        let score = 0;
+        let time = 10;
+        let timer;
+        let answered = false;
+
+        function startQuiz() {
+            document.getElementById("startScreen").style.display = "none";
+            document.getElementById("quizScreen").style.display = "block";
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            answered = false;
+            clearInterval(timer);
+            time = 10;
+            document.getElementById("timer").innerText = "⏱ Time: 10";
+            document.getElementById("result").innerHTML = "";
+            document.getElementById("nextBtn").style.display = "none";
+
+            document.getElementById("progress").style.width =
+                (current / quiz.length) * 100 + "%";
+
+            const q = quiz[current];
+            document.getElementById("question").innerText = q.question;
+
+            const answersDiv = document.getElementById("answers");
+            answersDiv.innerHTML = "";
+
+            q.answers.forEach((ans, i) => {
+                const btn = document.createElement("button");
+                btn.innerText = ans;
+                btn.onclick = () => checkAnswer(i, btn);
+                answersDiv.appendChild(btn);
+            });
+
+            timer = setInterval(() => {
+                time--;
+                document.getElementById("timer").innerText = "⏱ Time: " + time;
+                if (time === 0 && !answered) {
+                    clearInterval(timer);
+                    showResult(false);
+                }
+            }, 1000);
+        }
+
+        function checkAnswer(index, btn) {
+            if (answered) return;
+            answered = true;
+            clearInterval(timer);
+
+            const buttons = document.querySelectorAll("#answers button");
+            buttons.forEach(b => b.disabled = true);
+
+            if (index === quiz[current].correct) {
+                btn.classList.add("correct");
+                score++;
+                document.getElementById("correctSound").play();
+                showResult(true);
+            } else {
+                btn.classList.add("wrong");
+                buttons[quiz[current].correct].classList.add("correct");
+                document.getElementById("wrongSound").play();
+                showResult(false);
+            }
+        }
+
+        function showResult(isCorrect) {
+            document.getElementById("result").innerHTML =
+                isCorrect
+                    ? "✔️ <span style='color:green'>Correct</span>"
+                    : "❌ <span style='color:red'>Wrong</span>";
+
+            document.getElementById("nextBtn").style.display = "block";
+        }
+
+        function nextQuestion() {
+            current++;
+            if (current < quiz.length) {
+                loadQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        function endQuiz() {
+            document.getElementById("quizScreen").style.display = "none";
+            document.getElementById("endScreen").style.display = "block";
+            document.getElementById("finalScore").innerHTML =
+                `Your Score: <b>${score}/${quiz.length}</b>`;
+        }
+
+        function playAgain() {
+            current = 0;
+            score = 0;
+            document.getElementById("endScreen").style.display = "none";
+            document.getElementById("startScreen").style.display = "block";
+        }
+    </script>
+
+</body>
+
+</html>
