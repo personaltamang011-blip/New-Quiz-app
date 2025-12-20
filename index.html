@@ -5,11 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Quiz App</title>
+    <title>SarmiManiQuiz App</title>
 
     <style>
-
-       
         body {
             font-family: Arial;
             background: #eef2f3;
@@ -18,8 +16,8 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            
-            
+
+
         }
 
         .quiz-container {
@@ -42,6 +40,8 @@
             cursor: pointer;
             background: yellowgreen;
             color: white;
+            transition: background0.3s;
+
         }
 
         .next-btn {
@@ -56,12 +56,17 @@
 
 
 
+        /* These override disabled background */
         button.correct {
-            background: #2ecc71;
+            background: #2ecc71 !important;
+            /* green */
+            color: white !important;
         }
 
         button.wrong {
-            background: #e74c3c;
+            background: #e74c3c !important;
+            /* red */
+            color: white !important;
         }
 
         button:disabled {
@@ -93,6 +98,11 @@
             color: #e67e22;
         }
 
+        button.correct,
+        button.wrong {
+            color: white !important;
+        }
+
         @media (max-width: 480px) {
             body {
                 padding: 10px;
@@ -113,45 +123,44 @@
             }
         }
 
-     @media (max-width: 600px) {
-  body {
-    padding: 10px;
-  }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
 
-  .quiz-container {
-    width: 100%;
-    max-width: 100%;
-    min-height: auto;
-    border-radius: 12px;
-  }
-}
+            .quiz-container {
+                width: 100%;
+                max-width: 100%;
+                min-height: auto;
+                border-radius: 12px;
+            }
+        }
 
 
-  h2, h3 {
-    font-size: 22px;
-    line-height: 1.4;
-  }
+        h2,
+        h3 {
+            font-size: 22px;
+            line-height: 1.4;
+        }
 
-  button {
-    font-size: 18px;
-    padding: 16px;
-    margin: 10px 0;
-    border-radius: 8px;
-  }
+        button {
+            font-size: 18px;
+            padding: 16px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
 
-  #timer {
-    font-size: 16px;
-  }
+        #timer {
+            font-size: 16px;
+        }
 
-  #result {
-    font-size: 22px;
-  }
+        #result {
+            font-size: 22px;
+        }
 
-  .progress {
-    height: 10px;
-  }
-}
-
+        .progress {
+            height: 10px;
+        }
     </style>
 </head>
 
@@ -279,14 +288,23 @@
             const buttons = document.querySelectorAll("#answers button");
             buttons.forEach(b => b.disabled = true);
 
-            if (index === quiz[current].correct) {
-                btn.classList.add("correct");
+            const correctIndex = quiz[current].correct;
+
+            // Highlight correct and wrong answers
+            buttons.forEach((b, i) => {
+                if (i === correctIndex) {
+                    b.classList.add("correct"); // always show correct
+                } else if (i === index && i !== correctIndex) {
+                    b.classList.add("wrong"); // show wrong if clicked
+                }
+            });
+
+            // Play sound and show feedback
+            if (index === correctIndex) {
                 score++;
                 document.getElementById("correctSound").play();
                 showResult(true);
             } else {
-                btn.classList.add("wrong");
-                buttons[quiz[current].correct].classList.add("correct");
                 document.getElementById("wrongSound").play();
                 showResult(false);
             }
